@@ -13,6 +13,10 @@ import (
 	"github.com/marcboeker/go-duckdb/v2"
 )
 
+// EnableRegisterUDFFromSQL enables the registration of user-defined functions (UDFs) from SQL.
+// It registers a scalar UDF named "add_ixgo_udf" that allows adding more UDFs
+// from .ixgo files directly within SQL queries.
+// The signature of the SQL function is add_ixgo_udf(filename TEXT, funcNames TEXT...).
 func EnableRegisterUDFFromSQL(db *sql.DB) (err error) {
 	addUDF := func(filename string, funcNames ...string) int {
 		err = AddIXGoUDFFromFile(db, filename, funcNames...)
@@ -33,14 +37,20 @@ func EnableRegisterUDFFromSQL(db *sql.DB) (err error) {
 	return duckdb.RegisterScalarUDF(conn, "add_ixgo_udf", sf)
 }
 
+// AddIXGoUDFFromFile loads an .go or .xgo script from a file and registers the specified functions as UDFs in DuckDB.
 func AddIXGoUDFFromFile(db *sql.DB, filename string, funcNames ...string) (err error) {
 	return addIXGoUDF(db, filename, nil, funcNames...)
 }
 
+// AddIXGoUDFFromSource loads an .go or .xgo script from a source string or byte slice and registers the specified functions as UDFs in DuckDB.
+// The filename is used for error reporting.
 func AddIXGoUDFFromSource(db *sql.DB, src any, funcNames ...string) (err error) {
 	return addIXGoUDF(db, "main.xgo", src, funcNames...)
 }
 
+// addIXGoUDF is an internal function that handles the logic for loading an .go or .xgo package
+// from either a file or source, interpreting it, and registering the specified functions
+// as scalar UDFs in DuckDB.
 func addIXGoUDF(db *sql.DB, filename string, src any, funcNames ...string) (err error) {
 	conn, err := db.Conn(context.Background())
 	if err != nil {

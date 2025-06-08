@@ -1,6 +1,6 @@
 module github.com/ma6174/duckgo
 
-go 1.24.3
+go 1.24
 
 require (
 	github.com/goplus/ixgo v0.51.0
