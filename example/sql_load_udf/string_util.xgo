@@ -1,0 +1,5 @@
+import "fmt"
+
+func concatenate(s1 string, s2 string, sep string) string {
+	return fmt.Sprintf("%s%s%s", s1, sep, s2)
+}
