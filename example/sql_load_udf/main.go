@@ -16,20 +16,20 @@ func main() {
 	}
 	defer db.Close()
 
-	// 启用 SQL 函数 'add_ixgo_udf'
+	// Enable the SQL function 'add_ixgo_udf'
 	err = script.EnableRegisterUDFFromSQL(db)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// 使用 SQL 来加载脚本中的 UDF
-	// add_ixgo_udf(文件名, 函数名1, 函数名2, ...)
+	// Use SQL to load UDFs from a script
+	// add_ixgo_udf(filename, function_name1, function_name2, ...)
 	_, err = db.Exec("SELECT add_ixgo_udf('string_util.xgo', 'concatenate')")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// 现在就可以使用了!
+	// Now you can use it!
 	var result string
 	err = db.QueryRow("SELECT concatenate('hello', 'world', '---')").Scan(&result)
 	if err != nil {

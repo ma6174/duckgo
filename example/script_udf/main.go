@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/ma6174/duckgo/script" // 导入 script 包
+	"github.com/ma6174/duckgo/script" // Import the script package
 	_ "github.com/marcboeker/go-duckdb/v2"
 )
 
@@ -16,13 +16,13 @@ func main() {
 	}
 	defer db.Close()
 
-	// 从脚本文件加载 "multiply" 函数
+	// Load the "multiply" function from the script file
 	err = script.AddIXGoUDFFromFile(db, "my_udfs.go", "my_multiply")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// 在 SQL 中使用它
+	// Use it in SQL
 	var result int
 	err = db.QueryRow("SELECT my_multiply(7, 6)").Scan(&result)
 	if err != nil {
