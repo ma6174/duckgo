@@ -3,7 +3,7 @@ module github.com/ma6174/duckgo
 go 1.24
 
 require (
-	github.com/goplus/ixgo v0.51.0
+	github.com/goplus/ixgo v0.52.0
 	github.com/marcboeker/go-duckdb/v2 v2.3.1
 	github.com/stretchr/testify v1.10.0
 )
