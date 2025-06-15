@@ -1,0 +1,13 @@
+package main
+
+import "github.com/goccy/go-json"
+
+// add json array numbers, eg: [1,2,3]
+func jsonadd(s string) (sum int) {
+	var m []int
+	_ = json.Unmarshal([]byte(s), &m)
+	for _,v := range m {
+		sum += v
+	}
+	return sum
+}

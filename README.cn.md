@@ -65,6 +65,12 @@ go run -ldflags="-checklinkname=0" .
 
 **完整代码请参见: [`example/sql_load_udf/`](./example/sql_load_udf/)**
 
+### 示例 4：导入外部包
+
+`DuckGo` 支持从外部包（如 `github.com/goccy/go-json`）导入函数作为 UDF。这通过使用 `go generate` 和 [qexp](https://github.com/goplus/ixgo/tree/main/cmd/qexp) 预处理外部包来实现。
+
+**完整代码请参见: [`example/external_package/`](./example/external_package/)**
+
 ## 包概览
 
 - **`udf`**: 核心包，负责将原生的 Go 函数转换为 DuckDB UDF。

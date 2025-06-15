@@ -3,6 +3,7 @@ module github.com/ma6174/duckgo
 go 1.24
 
 require (
+	github.com/goccy/go-json v0.10.5
 	github.com/goplus/ixgo v0.52.0
 	github.com/marcboeker/go-duckdb/v2 v2.3.1
 	github.com/stretchr/testify v1.10.0
@@ -18,7 +19,6 @@ require (
 	github.com/duckdb/duckdb-go-bindings/linux-arm64 v0.1.10 // indirect
 	github.com/duckdb/duckdb-go-bindings/windows-amd64 v0.1.10 // indirect
 	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
-	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/google/flatbuffers v25.2.10+incompatible // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect

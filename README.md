@@ -65,6 +65,12 @@ First, enable the feature by calling `script.EnableRegisterUDFFromSQL(db)`. You 
 
 **For the full code, see: [`example/sql_load_udf/`](./example/sql_load_udf/)**
 
+### Example 4: Importing an External Package
+
+`DuckGo` supports importing functions from external packages (e.g., `github.com/goccy/go-json`) as UDFs. This is made possible by using `go generate` with [qexp](https://github.com/goplus/ixgo/tree/main/cmd/qexp) to pre-process the external package.
+
+**For the full code, see: [`example/external_package/`](./example/external_package/)**
+
 ## Package Overview
 
 - **`udf`**: The core package, responsible for converting native Go functions into DuckDB UDFs.
