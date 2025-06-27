@@ -18,7 +18,7 @@ require (
 	github.com/duckdb/duckdb-go-bindings/linux-amd64 v0.1.10 // indirect
 	github.com/duckdb/duckdb-go-bindings/linux-arm64 v0.1.10 // indirect
 	github.com/duckdb/duckdb-go-bindings/windows-amd64 v0.1.10 // indirect
-	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
+	github.com/go-viper/mapstructure/v2 v2.3.0 // indirect
 	github.com/google/flatbuffers v25.2.10+incompatible // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
