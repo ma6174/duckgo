@@ -71,21 +71,21 @@ func TestGoTypeToDuckDBTypeInfo(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			actualGoType := tt.goType
 			// For pointer types, goTypeToDuckDBTypeInfo is expected to dereference them once.
-			if (tt.name == "PointerToSimpleStruct" || strings.HasSuffix(tt.name, "*SimpleStruct")) && actualGoType.Kind() == reflect.Ptr {
-				// This direct dereferencing in the test might be too simplistic if goTypeToDuckDBTypeInfo handles nested pointers.
-				// However, for UDFs, we usually expect direct types or a single pointer to a struct.
-				// The main goTypeToDuckDBTypeInfo handles reflect.Struct and reflect.Map, not pointers to them directly for creating TypeInfo.
-				// It expects the Type of the element if the argument is a pointer.
-				// This test setup might need adjustment if the Ptr handling in goTypeToDuckDBTypeInfo changes.
-				// For now, the TypeInfo generator expects non-pointer types for struct/map definitions.
-				// If a UDF argument is *MyStruct, funcType.In(i) gives *MyStruct, we need to pass MyStruct to goTypeToDuckDBTypeInfo.
-				// This is implicitly handled by how BuildScalarUDF calls it if we had a BuildScalarUDF test for *Struct args.
-				// Let's adjust goTypeToDuckDBTypeInfo to handle one level of pointer dereferencing for struct/map kinds.
-				// This part of the test is tricky because the call path matters. Let's simplify the test for now and ensure goTypeToDuckDBTypeInfo is robust.
-				// The current goTypeToDuckDBTypeInfo doesn't explicitly dereference. It expects the element type.
-				// So, for a *SimpleStruct, this test should pass reflect.TypeOf(SimpleStruct{}) or handle it in goTypeToDuckDBTypeInfo.
-				// I've added a case for `reflect.Ptr` in goTypeToDuckDBTypeInfo to handle this.
-			}
+			// if (tt.name == "PointerToSimpleStruct" || strings.HasSuffix(tt.name, "*SimpleStruct")) && actualGoType.Kind() == reflect.Ptr {
+			// This direct dereferencing in the test might be too simplistic if goTypeToDuckDBTypeInfo handles nested pointers.
+			// However, for UDFs, we usually expect direct types or a single pointer to a struct.
+			// The main goTypeToDuckDBTypeInfo handles reflect.Struct and reflect.Map, not pointers to them directly for creating TypeInfo.
+			// It expects the Type of the element if the argument is a pointer.
+			// This test setup might need adjustment if the Ptr handling in goTypeToDuckDBTypeInfo changes.
+			// For now, the TypeInfo generator expects non-pointer types for struct/map definitions.
+			// If a UDF argument is *MyStruct, funcType.In(i) gives *MyStruct, we need to pass MyStruct to goTypeToDuckDBTypeInfo.
+			// This is implicitly handled by how BuildScalarUDF calls it if we had a BuildScalarUDF test for *Struct args.
+			// Let's adjust goTypeToDuckDBTypeInfo to handle one level of pointer dereferencing for struct/map kinds.
+			// This part of the test is tricky because the call path matters. Let's simplify the test for now and ensure goTypeToDuckDBTypeInfo is robust.
+			// The current goTypeToDuckDBTypeInfo doesn't explicitly dereference. It expects the element type.
+			// So, for a *SimpleStruct, this test should pass reflect.TypeOf(SimpleStruct{}) or handle it in goTypeToDuckDBTypeInfo.
+			// I've added a case for `reflect.Ptr` in goTypeToDuckDBTypeInfo to handle this.
+			// }
 
 			typeInfo, err := goTypeToDuckDBTypeInfo(actualGoType)
 
@@ -135,7 +135,7 @@ func TestConvertToReflectValue(t *testing.T) {
 		errorContains string // Substring for error message validation
 	}{
 		// Basic types (mostly existing, ensure they are still fine)
-		{"nil to interface", nil, reflect.TypeOf((*interface{})(nil)).Elem(), nil, false, ""},
+		{"nil to interface", nil, reflect.TypeOf((*any)(nil)).Elem(), nil, false, ""},
 		{"int64 to int", int64(123), reflect.TypeOf(int(0)), int(123), false, ""},
 		{"float64 to float32", float64(123.45), reflect.TypeOf(float32(0)), float32(123.45), false, ""},
 		{"string to string", "hello", reflect.TypeOf(""), "hello", false, ""},
@@ -155,16 +155,16 @@ func TestConvertToReflectValue(t *testing.T) {
 		// Struct conversion tests
 		{
 			"map to SimpleStruct (success)",
-			map[string]interface{}{"I": int32(10), "S": "test", "B": true},
+			map[string]any{"I": int32(10), "S": "test", "B": true},
 			reflect.TypeOf(TestSimpleStruct{}),
 			TestSimpleStruct{I: 10, S: "test", B: true},
 			false, "",
 		},
 		{
 			"map to NestedStruct (success)",
-			map[string]interface{}{
+			map[string]any{
 				"Name":   "nested",
-				"Simple": map[string]interface{}{"I": int32(20), "S": "inner", "B": false},
+				"Simple": map[string]any{"I": int32(20), "S": "inner", "B": false},
 				"Val":    &int64PtrVal,
 			},
 			reflect.TypeOf(TestNestedStruct{}),
@@ -173,14 +173,14 @@ func TestConvertToReflectValue(t *testing.T) {
 		},
 		{
 			"map to SimpleStruct (missing field error)",
-			map[string]interface{}{"I": int32(10), "B": true}, // Missing S
+			map[string]any{"I": int32(10), "B": true}, // Missing S
 			reflect.TypeOf(TestSimpleStruct{}),
 			nil,
 			true, "field 'S' missing",
 		},
 		{
 			"map to SimpleStruct (type mismatch error for field)",
-			map[string]interface{}{"I": "not-an-int", "S": "test", "B": true},
+			map[string]any{"I": "not-an-int", "S": "test", "B": true},
 			reflect.TypeOf(TestSimpleStruct{}),
 			nil,
 			true, "error converting field 'I'",
@@ -211,7 +211,7 @@ func TestConvertToReflectValue(t *testing.T) {
 		{
 			"duckdb.Map to map[int]TestSimpleStruct (success)",
 			duckdb.Map(map[any]any{
-				int(1): map[string]interface{}{"I": int32(1), "S": "one", "B": true},
+				int(1): map[string]any{"I": int32(1), "S": "one", "B": true},
 			}),
 			reflect.TypeOf(map[int]TestSimpleStruct{}),
 			map[int]TestSimpleStruct{1: {I: 1, S: "one", B: true}},

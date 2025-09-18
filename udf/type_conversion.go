@@ -28,12 +28,11 @@ import (
 // Empty structs (with no exported fields) are also not supported.
 func goTypeToDuckDBTypeInfo(rt reflect.Type) (duckdb.TypeInfo, error) {
 	// Handle pointer dereferencing.
-	if rt.Kind() == reflect.Ptr {
+	if rt.Kind() == reflect.Pointer {
 		elemType := rt.Elem()
 		// Dereference if the element is a struct, map, time.Time, or a supported basic type.
 		switch elemType.Kind() {
-		case reflect.Struct,
-			reflect.Map:
+		case reflect.Struct, reflect.Map:
 			rt = elemType // Dereference for struct and map
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
 			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
@@ -44,7 +43,7 @@ func goTypeToDuckDBTypeInfo(rt reflect.Type) (duckdb.TypeInfo, error) {
 		default:
 			// For other pointer types (e.g., pointer to slice, pointer to unsupported type),
 			// check if it's *time.Time specifically, otherwise it might be unsupported.
-			if !(elemType.PkgPath() == "time" && elemType.Name() == "Time") {
+			if elemType.PkgPath() != "time" || elemType.Name() != "Time" {
 				// Fall through to the main switch for default error handling if not *time.Time
 				// or if it's a pointer to something we don't want to auto-dereference here.
 			} else {
@@ -192,7 +191,7 @@ func convertToReflectValue(sourceVal driver.Value, targetType reflect.Type) (ref
 		// If the target is a pointer, slice, map, chan, func, or interface, a nil sourceVal maps to a nil reflect.Value of that type.
 		// For structs, it maps to a zero struct.
 		switch targetType.Kind() {
-		case reflect.Ptr, reflect.Slice, reflect.Map, reflect.Chan, reflect.Func, reflect.Interface:
+		case reflect.Pointer, reflect.Slice, reflect.Map, reflect.Chan, reflect.Func, reflect.Interface:
 			return reflect.Zero(targetType), nil
 		case reflect.Struct: // Allow nil to be converted to a zero struct if target is a struct
 			return reflect.Zero(targetType), nil
@@ -239,7 +238,7 @@ func convertToReflectValue(sourceVal driver.Value, targetType reflect.Type) (ref
 	// Handle specific target kinds before general convertibility for more control
 	switch targetType.Kind() {
 	case reflect.Struct: // time.Time is already handled
-		srcMap, ok := sourceVal.(map[string]interface{})
+		srcMap, ok := sourceVal.(map[string]any)
 		if !ok {
 			return reflect.Value{}, fmt.Errorf("expected map[string]interface{} from driver for DuckDB STRUCT, but got %T for target Go struct %s", sourceVal, targetType.Name())
 		}
@@ -295,7 +294,7 @@ func convertToReflectValue(sourceVal driver.Value, targetType reflect.Type) (ref
 	}
 
 	// Handle cases where targetType is a pointer to a basic type (e.g. *string, *int)
-	if targetType.Kind() == reflect.Ptr {
+	if targetType.Kind() == reflect.Pointer {
 		elemType := targetType.Elem()
 		// Attempt to convert sourceVal to the element type first
 		convertedElemVal, err := convertToReflectValue(sourceVal, elemType)

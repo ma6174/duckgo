@@ -55,7 +55,7 @@ func (asf *autoScalarFunc) processVariadicArgs(inputArgs []driver.Value, numFixe
 	callArgs := make([]reflect.Value, numCallArgs)
 
 	// Convert fixed parameters
-	for i := 0; i < numFixedGoParams; i++ {
+	for i := range numFixedGoParams {
 		goArgType := asf.goArgTypes[i] // Type of the i-th fixed Go parameter
 		duckDBVal := inputArgs[i]
 		convertedVal, conversionErr := convertToReflectValue(duckDBVal, goArgType)
@@ -71,7 +71,7 @@ func (asf *autoScalarFunc) processVariadicArgs(inputArgs []driver.Value, numFixe
 	variadicGoSliceType := asf.goArgTypes[numFormalGoParams-1] // Type of the last formal parameter
 	variadicGoElemType := variadicGoSliceType.Elem()           // Element type (e.g., reflect.TypeOf(int))
 
-	for i := 0; i < numVariadicInputsProvided; i++ {
+	for i := range numVariadicInputsProvided {
 		duckDBVal := inputArgs[numFixedGoParams+i]
 		convertedVal, conversionErr := convertToReflectValue(duckDBVal, variadicGoElemType)
 		if conversionErr != nil {
@@ -96,7 +96,7 @@ func (asf *autoScalarFunc) processNonVariadicArgs(inputArgs []driver.Value) ([]r
 
 	// Convert all parameters
 	callArgs := make([]reflect.Value, numFormalGoParams)
-	for i := 0; i < numFormalGoParams; i++ {
+	for i := range numFormalGoParams {
 		goArgType := asf.goArgTypes[i]
 		duckDBVal := inputArgs[i]
 		convertedVal, conversionErr := convertToReflectValue(duckDBVal, goArgType)
