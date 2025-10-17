@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/marcboeker/go-duckdb/v2"
+	"github.com/duckdb/duckdb-go/v2"
 )
 
 // goTypeToDuckDBTypeInfo converts a Go reflect.Type to a DuckDB TypeInfo.

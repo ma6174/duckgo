@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/duckdb/duckdb-go/v2"
 	"github.com/ma6174/duckgo/udf"
-	"github.com/marcboeker/go-duckdb/v2"
 	"github.com/stretchr/testify/require"
 )
 
@@ -31,7 +31,7 @@ package main
 func myadd(a,b int) int {
 	return a+b
 }
-`), 0644)
+`), 0o644)
 	require.NoError(t, err)
 
 	t.Run("from file", func(t *testing.T) {
@@ -70,7 +70,7 @@ package main
 func mymul(a,b int) int {
 	return a*b
 }
-`), 0644)
+`), 0o644)
 	require.NoError(t, err)
 
 	db := newTestDB(t)

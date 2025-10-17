@@ -3,9 +3,9 @@
 package json
 
 import (
-	q "github.com/goccy/go-json"
-
 	"reflect"
+
+	q "github.com/goccy/go-json"
 
 	"github.com/goplus/ixgo"
 )

@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/marcboeker/go-duckdb/v2"
+	"github.com/duckdb/duckdb-go/v2"
 )
 
 func TestGoTypeToDuckDBTypeInfo(t *testing.T) {

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
+	_ "github.com/duckdb/duckdb-go/v2"
 	"github.com/ma6174/duckgo/script" // Import the script package
-	_ "github.com/marcboeker/go-duckdb/v2"
 )
 
 func main() {

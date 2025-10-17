@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/marcboeker/go-duckdb/v2"
+	"github.com/duckdb/duckdb-go/v2"
 )
 
 func TestSuccessfulUDFRegistrationAndExecution(t *testing.T) {

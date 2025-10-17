@@ -6,11 +6,11 @@ import (
 	"errors"
 	"log"
 
+	"github.com/duckdb/duckdb-go/v2"
 	"github.com/goplus/ixgo"
 	_ "github.com/goplus/ixgo/pkg"
 	_ "github.com/goplus/ixgo/xgobuild"
 	"github.com/ma6174/duckgo/udf"
-	"github.com/marcboeker/go-duckdb/v2"
 )
 
 // EnableRegisterUDFFromSQL enables the registration of user-defined functions (UDFs) from SQL.
@@ -60,15 +60,15 @@ func addIXGoUDF(db *sql.DB, filename string, src any, funcNames ...string) (err 
 	ctx := ixgo.NewContext(0)
 	pkg, err := ctx.LoadFile(filename, src)
 	if err != nil {
-		return
+		return err
 	}
 	interp, err := ctx.NewInterp(pkg)
 	if err != nil {
-		return
+		return err
 	}
 	err = interp.RunInit()
 	if err != nil {
-		return
+		return err
 	}
 	for _, funcName := range funcNames {
 		fi, ok := interp.GetFunc(funcName)

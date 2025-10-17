@@ -6,7 +6,7 @@ import "github.com/goccy/go-json"
 func jsonadd(s string) (sum int) {
 	var m []int
 	_ = json.Unmarshal([]byte(s), &m)
-	for _,v := range m {
+	for _, v := range m {
 		sum += v
 	}
 	return sum
