@@ -14,12 +14,10 @@ This example demonstrates how to import an external Go package (`github.com/gocc
 
 2.  **Run the Example**
 
-    Due to the use of `ixgo` for dynamic code interpretation, you need to provide a specific linker flag (`-checklinkname=0`) to disable symbol link name checking when running the example.
-
     Execute the following command from within this directory (`example/external_package`):
 
     ```bash
-    go run -ldflags="-checklinkname=0" .
+    go run .
     ```
 
     This will execute the `main.go` program, which dynamically loads functions from the `github.com/goccy/go-json` package and calls them within a SQL query.

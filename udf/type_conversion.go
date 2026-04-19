@@ -9,6 +9,67 @@ import (
 	"github.com/duckdb/duckdb-go/v2"
 )
 
+// orderedMap is an interface that both duckdb.Map and duckdb.OrderedMap can satisfy
+// for reading key-value pairs. This allows the code to handle both the legacy
+// duckdb.Map (map[any]any) and the newer duckdb.OrderedMap (struct with Keys()/Values()).
+type orderedMap interface {
+	MapKeys() []any
+	MapValues() []any
+}
+
+// mapWrapper wraps a duckdb.Map to implement the orderedMap interface.
+// It caches keys and values in a single pass to ensure consistent ordering.
+type mapWrapper struct {
+	keys   []any
+	values []any
+}
+
+func newMapWrapper(m duckdb.Map) mapWrapper {
+	keys := make([]any, 0, len(m))
+	values := make([]any, 0, len(m))
+	for k, v := range m {
+		keys = append(keys, k)
+		values = append(values, v)
+	}
+	return mapWrapper{keys: keys, values: values}
+}
+
+func (w mapWrapper) MapKeys() []any   { return w.keys }
+func (w mapWrapper) MapValues() []any { return w.values }
+
+// orderedMapValueWrapper wraps a duckdb.OrderedMap value to implement the orderedMap interface.
+type orderedMapValueWrapper struct {
+	om duckdb.OrderedMap
+}
+
+func (w orderedMapValueWrapper) MapKeys() []any   { return w.om.Keys() }
+func (w orderedMapValueWrapper) MapValues() []any { return w.om.Values() }
+
+// orderedMapPtrWrapper wraps a *duckdb.OrderedMap to implement the orderedMap interface.
+type orderedMapPtrWrapper struct {
+	om *duckdb.OrderedMap
+}
+
+func (w orderedMapPtrWrapper) MapKeys() []any   { return w.om.Keys() }
+func (w orderedMapPtrWrapper) MapValues() []any { return w.om.Values() }
+
+// toOrderedMap converts a driver.Value (duckdb.Map or duckdb.OrderedMap) to the orderedMap interface.
+func toOrderedMap(sourceVal driver.Value) (orderedMap, bool) {
+	// New driver returns duckdb.OrderedMap (value type)
+	if om, ok := sourceVal.(duckdb.OrderedMap); ok {
+		return orderedMapValueWrapper{om: om}, true
+	}
+	// Also handle pointer just in case
+	if om, ok := sourceVal.(*duckdb.OrderedMap); ok {
+		return orderedMapPtrWrapper{om: om}, true
+	}
+	// Legacy duckdb.Map (map[any]any)
+	if m, ok := sourceVal.(duckdb.Map); ok {
+		return newMapWrapper(m), true
+	}
+	return nil, false
+}
+
 // goTypeToDuckDBTypeInfo converts a Go reflect.Type to a DuckDB TypeInfo.
 // This function returns duckdb.TypeInfo, which encapsulates the logical description of the type.
 //
@@ -261,15 +322,19 @@ func convertToReflectValue(sourceVal driver.Value, targetType reflect.Type) (ref
 		return newStruct, nil
 
 	case reflect.Map:
-		srcDuckDBMap, ok := sourceVal.(duckdb.Map)
+		srcMap, ok := toOrderedMap(sourceVal)
 		if !ok {
-			return reflect.Value{}, fmt.Errorf("expected duckdb.Map from driver for DuckDB MAP, but got %T for target Go map %s", sourceVal, targetType.String())
+			return reflect.Value{}, fmt.Errorf("expected duckdb.Map or duckdb.OrderedMap from driver for DuckDB MAP, but got %T for target Go map %s", sourceVal, targetType.String())
 		}
 		goMapType := targetType
-		newGoMap := reflect.MakeMapWithSize(goMapType, len(srcDuckDBMap))
+		keys := srcMap.MapKeys()
+		values := srcMap.MapValues()
+		newGoMap := reflect.MakeMapWithSize(goMapType, len(keys))
 		goMapKeyType := goMapType.Key()
 		goMapElemType := goMapType.Elem()
-		for k, v := range srcDuckDBMap {
+		for i := range keys {
+			k := keys[i]
+			v := values[i]
 			convertedKey, err := convertToReflectValue(k, goMapKeyType)
 			if err != nil {
 				return reflect.Value{}, fmt.Errorf("error converting map key for target Go map %s: %w", goMapType.String(), err)

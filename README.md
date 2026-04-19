@@ -19,24 +19,6 @@
 go get github.com/ma6174/duckgo
 ```
 
-## Important Note: Regarding Dynamic Scripting
-
-The dynamic script loading feature (provided by the `script` package) relies on [ixgo](https://github.com/goplus/ixgo). Due to how `ixgo` works, you **must** add a specific linker flag to disable symbol name checking whenever you build or run code that uses the `script` package.
-
-Failure to do so will result in a linker error.
-
-**Build:**
-```bash
-go build -ldflags="-checklinkname=0" .
-```
-
-**Run:**
-```bash
-go run -ldflags="-checklinkname=0" .
-```
-
-If you import the `script` package in your own project, make sure to include this flag in your build and run commands.
-
 ## Usage
 
 Here are a few examples of how to use `DuckGo`. For complete, runnable code, please see the [`example`](./example) directory.

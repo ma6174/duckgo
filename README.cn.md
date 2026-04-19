@@ -19,24 +19,6 @@
 go get github.com/ma6174/duckgo
 ```
 
-## 重要提示：关于动态脚本功能
-
-本项目的动态脚本加载功能（由 `script` 包提供）依赖于 [ixgo](https://github.com/goplus/ixgo)。由于 `ixgo` 的工作原理，当您编译或运行任何使用了 `script` 包的代码时，**必须**添加一个特定的链接器标志来禁用符号链接检查。
-
-否则，您会遇到链接器错误。
-
-**编译时:**
-```bash
-go build -ldflags="-checklinkname=0" .
-```
-
-**运行时:**
-```bash
-go run -ldflags="-checklinkname=0" .
-```
-
-如果您在自己的项目里引用了本库的 `script` 包，请务必在您的编译和运行命令中加入此标志。
-
 ## 使用方法
 
 下面是几个例子，展示了如何使用 `DuckGo`。完整的可运行示例代码存放在 [`example`](./example) 目录下。

@@ -70,7 +70,7 @@ func BuildScalarUDF(fn any, opts ...func(*udfOption)) (duckdb.ScalarFunc, error)
 
 	numTotalGoArgs := funcType.NumIn()
 	goArgTypes := make([]reflect.Type, numTotalGoArgs)
-	for i := 0; i < numTotalGoArgs; i++ {
+	for i := range numTotalGoArgs {
 		goArgTypes[i] = funcType.In(i)
 	}
 

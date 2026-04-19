@@ -11,9 +11,9 @@ import (
 // Helper functions only used in tests to execute queries and check results
 
 // querySingleValueOnConn is a helper function to query a single value on a specific *sql.Conn
-func querySingleValueOnConn(t *testing.T, conn *sql.Conn, query string, args ...interface{}) interface{} {
+func querySingleValueOnConn(t *testing.T, conn *sql.Conn, query string, args ...any) any {
 	t.Helper()
-	var resultPlaceholder interface{} // Placeholder for Scan
+	var resultPlaceholder any // Placeholder for Scan
 	err := conn.QueryRowContext(context.Background(), query, args...).Scan(&resultPlaceholder)
 	if err != nil {
 		t.Fatalf("Error executing query: %v", err)
@@ -26,7 +26,7 @@ func querySingleValueOnConn(t *testing.T, conn *sql.Conn, query string, args ...
 // For all integer types, scan into int64 as that's the generic representation from the DB
 
 // expectQueryErrorOnConn is a helper function to expect an error on a specific *sql.Conn
-func expectQueryErrorOnConn(t *testing.T, conn *sql.Conn, expectedErrorSubstring string, query string, args ...interface{}) {
+func expectQueryErrorOnConn(t *testing.T, conn *sql.Conn, expectedErrorSubstring string, query string, args ...any) {
 	t.Helper()
 	rows, errQuery := conn.QueryContext(context.Background(), query, args...)
 
@@ -71,7 +71,7 @@ func expectError(t *testing.T, err error, expectedMsgSubstring string) {
 }
 
 // Helper function to check if a value is nil
-func assertNil(t *testing.T, v interface{}, msg string, args ...interface{}) {
+func assertNil(t *testing.T, v any, msg string, args ...any) {
 	t.Helper()
 	if v != nil {
 		t.Fatalf(msg, args...)
@@ -79,7 +79,7 @@ func assertNil(t *testing.T, v interface{}, msg string, args ...interface{}) {
 }
 
 // Helper function to check if two values are equal
-func assertEqual(t *testing.T, expected, actual interface{}, msg string, args ...interface{}) {
+func assertEqual(t *testing.T, expected, actual any, msg string, args ...any) {
 	t.Helper()
 	if !reflect.DeepEqual(expected, actual) {
 		t.Fatalf(msg, args...)
@@ -87,7 +87,7 @@ func assertEqual(t *testing.T, expected, actual interface{}, msg string, args ..
 }
 
 // Helper function to check if a condition is true
-func assertTrue(t *testing.T, condition bool, msg string, args ...interface{}) {
+func assertTrue(t *testing.T, condition bool, msg string, args ...any) {
 	t.Helper()
 	if !condition {
 		t.Fatalf(msg, args...)
@@ -95,7 +95,7 @@ func assertTrue(t *testing.T, condition bool, msg string, args ...interface{}) {
 }
 
 // Helper function to fail the test with a message
-func fail(t *testing.T, msg string, args ...interface{}) {
+func fail(t *testing.T, msg string, args ...any) {
 	t.Helper()
 	t.Fatalf(msg, args...)
 }
