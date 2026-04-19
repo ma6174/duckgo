@@ -393,3 +393,34 @@ func convertToReflectValue(sourceVal driver.Value, targetType reflect.Type) (ref
 	return reflect.Value{}, fmt.Errorf("cannot convert DuckDB driver.Value of type %s (Go type %s, value: %v) to Go function parameter type %s",
 		reflect.TypeOf(sourceVal).String(), sourceReflectVal.Type().String(), sourceVal, targetType.String())
 }
+
+// convertGoToDuckDBValue converts a Go return value from a user-defined function to a DuckDB-compatible value.
+// This is the inverse of convertToReflectValue, handling the conversion from Go types back to DuckDB driver values.
+//
+// Currently handles:
+//   - Go map[K]V -> duckdb.OrderedMap (DuckDB requires OrderedMap for MAP return values)
+//   - All other types are returned as-is (DuckDB driver handles basic types natively)
+func convertGoToDuckDBValue(val any) (any, error) {
+	if val == nil {
+		return nil, nil
+	}
+
+	rv := reflect.ValueOf(val)
+
+	// Convert Go map to duckdb.OrderedMap, which DuckDB requires for MAP return values.
+	// If the value is already a duckdb.OrderedMap, return it directly.
+	switch rv.Kind() {
+	case reflect.Map:
+		if _, ok := val.(duckdb.OrderedMap); ok {
+			return val, nil
+		}
+		result := duckdb.OrderedMap{}
+		iter := rv.MapRange()
+		for iter.Next() {
+			result.Set(iter.Key().Interface(), iter.Value().Interface())
+		}
+		return result, nil
+	default:
+		return val, nil
+	}
+}

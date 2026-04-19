@@ -161,21 +161,8 @@ func (asf *autoScalarFunc) Executor() duckdb.ScalarFuncExecutor {
 			results := asf.userFunc.Call(callArgs)
 			userReturnVal := results[0].Interface()
 
-			// Return value handling (including previous fix for map return types)
-			if asf.goReturnType.Kind() == reflect.Map {
-				if _, ok := userReturnVal.(duckdb.OrderedMap); !ok && userReturnVal != nil {
-					rvMap := reflect.ValueOf(userReturnVal)
-					if rvMap.Kind() == reflect.Map {
-						newDuckDBMap := duckdb.OrderedMap{}
-						iter := rvMap.MapRange()
-						for iter.Next() {
-							newDuckDBMap.Set(iter.Key().Interface(), iter.Value().Interface())
-						}
-						return newDuckDBMap, nil
-					}
-				}
-			}
-			return userReturnVal, nil
+			// Convert Go return value to DuckDB-compatible value
+			return convertGoToDuckDBValue(userReturnVal)
 		},
 	}
 }
