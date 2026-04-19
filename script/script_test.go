@@ -104,6 +104,16 @@ func TestAddUDF(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestEnableRegisterUDFFromSQLError(t *testing.T) {
+	db := newTestDB(t)
+	err := EnableRegisterUDFFromSQL(db)
+	require.NoError(t, err)
+
+	_, err = db.Exec("select add_ixgo_udf('nonexistent.go', 'badfunc')")
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "add_ixgo_udf: failed to load UDF")
+}
+
 func BenchmarkNativeUDF(b *testing.B) {
 	db := newTestDB(b)
 	add := func(a, b int) int {

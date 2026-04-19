@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/duckdb/duckdb-go/v2"
@@ -17,11 +18,11 @@ import (
 // It registers a scalar UDF named "add_ixgo_udf" that allows adding more UDFs
 // from .ixgo files directly within SQL queries.
 // The signature of the SQL function is add_ixgo_udf(filename TEXT, funcNames TEXT...).
-func EnableRegisterUDFFromSQL(db *sql.DB) (err error) {
+func EnableRegisterUDFFromSQL(db *sql.DB) error {
 	addUDF := func(filename string, funcNames ...string) int {
-		err = AddIXGoUDFFromFile(db, filename, funcNames...)
+		err := AddIXGoUDFFromFile(db, filename, funcNames...)
 		if err != nil {
-			log.Panicln(err)
+			panic(fmt.Errorf("add_ixgo_udf: failed to load UDF from %q: %w", filename, err))
 		}
 		return 1
 	}
