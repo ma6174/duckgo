@@ -25,7 +25,7 @@ require (
 	github.com/goplus/mod v0.20.2 // indirect
 	github.com/goplus/reflectx v1.6.4 // indirect
 	github.com/goplus/xgo v1.7.1 // indirect
-	github.com/klauspost/compress v1.18.5 // indirect
+	github.com/klauspost/compress v1.18.7 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.26 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
